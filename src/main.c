@@ -32,6 +32,7 @@
 
 // this
 #include "conf_board.h"
+#include "conf_tc_irq.h"
 #include "ii.h"
 	
 

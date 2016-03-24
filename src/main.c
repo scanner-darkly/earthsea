@@ -374,6 +374,8 @@ static softTimer_t midiPollTimer = { .next = NULL, .prev = NULL };
 
 
 static void aout_write(void) {
+	cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
+
 	spi_selectChip(SPI,DAC_SPI);
 	spi_write(SPI,0x31);
 	spi_write(SPI,aout[2].now>>4);
@@ -391,6 +393,8 @@ static void aout_write(void) {
 	spi_write(SPI,aout[1].now>>4);
 	spi_write(SPI,aout[1].now<<4);
 	spi_unselectChip(SPI,DAC_SPI);
+
+	cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
 }
 
 static void cvTimer_callback(void* o) { 
@@ -1302,6 +1306,7 @@ static void shape(u8 s, u8 x, u8 y) {
 	}
 
 	if(!arp && r_status == rOff && !port_active) {
+		cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
 
 		spi_selectChip(SPI,DAC_SPI);
 
@@ -1314,6 +1319,8 @@ static void shape(u8 s, u8 x, u8 y) {
 		spi_write(SPI,0xff);
 
 		spi_unselectChip(SPI,DAC_SPI);
+
+		cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
 	}
 
 	if(s == 0)
@@ -1401,6 +1408,8 @@ static void pattern_shape(u8 s, u8 x, u8 y) {
 		}
 
 		if(!port_active) {
+			cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
+
 			spi_selectChip(SPI,DAC_SPI);
 
 			spi_write(SPI,0x38);	// update B
@@ -1412,6 +1421,7 @@ static void pattern_shape(u8 s, u8 x, u8 y) {
 			spi_write(SPI,0xff);
 
 			spi_unselectChip(SPI,DAC_SPI);
+			cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
 		}
 
 		if(s == 0) {
@@ -2543,7 +2553,7 @@ int main(void)
 	// ensure cvTimer_callback does something
 	slew_active = 1;
 
-	timer_add(&clockTimer,6,&clockTimer_callback, NULL);
+	timer_add(&clockTimer,10,&clockTimer_callback, NULL);
 	timer_add(&cvTimer,5,&cvTimer_callback, NULL);
 	timer_add(&keyTimer,51,&keyTimer_callback, NULL);
 	// adc timer is added inside the monome connect handler 

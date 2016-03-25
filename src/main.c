@@ -1290,7 +1290,7 @@ static void shape(u8 s, u8 x, u8 y) {
 		es.p[p_select].x = x - es.p[p_select].e[0].x;
 		es.p[p_select].y = y - es.p[p_select].e[0].y;
 	}
-	else if(s<4) {
+	else if(s<5) {
 		// cv_pos = SCALES[0][x] + (7-y)*170;
 		// cv_pos = SEMI[x+(7-y)*5];
 		aout[3].target = SEMI[x+(7-y)*5];

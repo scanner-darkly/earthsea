@@ -375,7 +375,7 @@ static softTimer_t midiPollTimer = { .next = NULL, .prev = NULL };
 
 
 static void aout_write(void) {
-	cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
+	// cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
 
 	spi_selectChip(SPI,DAC_SPI);
 	spi_write(SPI,0x31);
@@ -395,7 +395,7 @@ static void aout_write(void) {
 	spi_write(SPI,aout[1].now<<4);
 	spi_unselectChip(SPI,DAC_SPI);
 
-	cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
+	// cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
 }
 
 static void cvTimer_callback(void* o) { 
@@ -762,7 +762,7 @@ static void monome_refresh_timer_callback(void* obj) {
 // monome: start polling
 void timers_set_monome(void) {
 	// print_dbg("\r\n setting monome timers");
-	timer_add(&monomePollTimer, 20, &monome_poll_timer_callback, NULL );
+	timer_add(&monomePollTimer, 11, &monome_poll_timer_callback, NULL );
 	timer_add(&monomeRefreshTimer, 30, &monome_refresh_timer_callback, NULL );
 }
 
@@ -1307,7 +1307,7 @@ static void shape(u8 s, u8 x, u8 y) {
 	}
 
 	if(!arp && r_status == rOff && !port_active) {
-		cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
+		// cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
 
 		spi_selectChip(SPI,DAC_SPI);
 
@@ -1321,7 +1321,7 @@ static void shape(u8 s, u8 x, u8 y) {
 
 		spi_unselectChip(SPI,DAC_SPI);
 
-		cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
+		// cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
 	}
 
 	if(s == 0)
@@ -1409,7 +1409,7 @@ static void pattern_shape(u8 s, u8 x, u8 y) {
 		}
 
 		if(!port_active) {
-			cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
+			// cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
 
 			spi_selectChip(SPI,DAC_SPI);
 
@@ -1422,7 +1422,7 @@ static void pattern_shape(u8 s, u8 x, u8 y) {
 			spi_write(SPI,0xff);
 
 			spi_unselectChip(SPI,DAC_SPI);
-			cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
+			// cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
 		}
 
 		if(s == 0) {

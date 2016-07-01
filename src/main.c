@@ -334,8 +334,8 @@ void pattern_time_double(void);
 void reset_hys(void);
 
 
-static void es_process_ii(uint8_t i, int d);
-static void es_midi_process_ii(uint8_t i, int d);
+static void es_process_ii(uint8_t *data, uint8_t l);
+static void es_midi_process_ii(uint8_t *data, uint8_t l);
 
 
 void reset_hys() {
@@ -1798,11 +1798,17 @@ static void refresh_preset() {
 
 
 
-static void es_process_ii(uint8_t i, int d) {
+static void es_process_ii(uint8_t *data, uint8_t l) {
 	// print_dbg("\r\nes: ");
 	// print_dbg_hex(i);
 	// print_dbg(" ");
 	// print_dbg_ulong(d);
+
+	uint8_t i;
+	int d;
+
+	i = data[0];
+	d = (data[1] << 8) + data[2];
 
 	switch(i) {
 		case ES_PRESET:
@@ -2326,7 +2332,7 @@ static void handler_MidiPacket(s32 raw) {
   }
 }
 
-static void es_midi_process_ii(uint8_t i, int d) {
+static void es_midi_process_ii(uint8_t *data, uint8_t l) {
 	// for now we do nothing
 	// tt clocked arp would be fun
 }

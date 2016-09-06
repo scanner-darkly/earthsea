@@ -264,6 +264,7 @@ u8 all_edit;
 
 u8 clock_mode;
 
+note_pool_t notes;
 u8 midi_legato;
 u8 sustain_active;
 s16 pitch_offset;
@@ -2034,7 +2035,7 @@ static void midi_note_on(u8 ch, u8 num, u8 vel) {
 		return;
 
 	// keep track of held notes for legato
-	notes_hold(num, vel);
+	notes_hold(&notes, num, vel);
 		
 	// suspend slew cvTimer
 	slew_active = 0;
@@ -2070,10 +2071,10 @@ static void midi_note_off(u8 ch, u8 num, u8 vel) {
 		return;
 		
 	if (sustain_active == 0) {
-		notes_release(num);
+		notes_release(&notes, num);
 
 		if (midi_legato) {
-			const held_note_t *prior = notes_get(kNotePriorityLast);
+			const held_note_t *prior = notes_get(&notes, kNotePriorityLast);
 			if (prior) {
 				// print_dbg("\r\n   prior // num: ");
 				// print_dbg_ulong(prior->num);
@@ -2124,7 +2125,7 @@ static void midi_pitch_bend(u8 ch, u16 bend) {
 	}
 
 	// re-set pitch to pick up changed offset
-	const held_note_t *active = notes_get(kNotePriorityLast);
+	const held_note_t *active = notes_get(&notes, kNotePriorityLast);
 	if (active) {
 		aout_set_pitch_slew(active->num, MIDI_BEND_SLEW);  // TODO: make slew configurable
 		aout_write();
@@ -2133,7 +2134,7 @@ static void midi_pitch_bend(u8 ch, u16 bend) {
 
 static void midi_sustain(u8 ch, u8 val) {
 	if (val < 64) {
-		notes_init();
+		notes_init(&notes);
 		gpio_clr_gpio_pin(B00);
 		sustain_active = 0;
 	}
@@ -2223,7 +2224,7 @@ static void handler_MidiConnect(s32 data) {
 		
 	process_ii = &es_midi_process_ii;
 	
-	notes_init();
+	notes_init(&notes);
 	midi_legato = 1; // FIXME: allow this to be controlled!
 	port_active = 1; // FIXME: allow this to be controlled!
 	sustain_active = 0;

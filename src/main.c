@@ -1500,8 +1500,9 @@ static void pattern_shape(u8 s, u8 x, u8 y) {
 static void refresh() {
 	u8 i1, i2, i3;
 
-	// CLEAR // FIXME: optimize? 
-	// for(i1=0;i1<128;i1++) monomeLedBuffer[i1] = 0;
+
+	// memset(monomeLedBuffer,0,128);
+	// HELP KEYS
 	for(i1=0;i1<8;i1++) {
 		for(i2=0;i2<16;i2++)
 			monomeLedBuffer[i1*16+i2] = es.help[i2][i1] << 2;
@@ -1567,8 +1568,11 @@ static void refresh() {
 	}
 	// STATE	
 	else {
-		if(arp)
-			monomeLedBuffer[(es.p[p_select].e[0].y + es.p[p_select].y) * 16 + es.p[p_select].x + es.p[p_select].e[0].x] = 7;
+		if(arp) {
+			if( (es.p[p_select].e[0].y + es.p[p_select].y < 8) && (es.p[p_select].x + es.p[p_select].e[0].x < 16) ) {
+				monomeLedBuffer[(es.p[p_select].e[0].y + es.p[p_select].y) * 16 + es.p[p_select].x + es.p[p_select].e[0].x] = 7;
+			}
+		}
 
 		if(port_active)
 			for(i1=0;i1<(port_time>>4)+1;i1++)

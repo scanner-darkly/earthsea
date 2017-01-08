@@ -1305,7 +1305,12 @@ static void shape(u8 s, u8 x, u8 y) {
 	else if(s<5) {
 		// cv_pos = SCALES[0][x] + (7-y)*170;
 		// cv_pos = SEMI[x+(7-y)*5];
-		aout[3].target = SEMI[x+(7-y)*5];
+		// print_dbg("\r\n x:");
+		// print_dbg_ulong(x);
+		aout[3].target = SEMI[(x+(7-y)*5) - 1];
+		// print_dbg("\r\n cv:");
+		// print_dbg_ulong(aout[3].target);
+		
 		// aout[3].target = TONE[x*scale[scale_x]+(7-y)*scale[scale_y]];
 
 		if(port_active) {
@@ -1407,7 +1412,7 @@ static void pattern_shape(u8 s, u8 x, u8 y) {
 	else {
 		// cv_pos = SCALES[0][x] + (7-y)*170;
 
-		aout[3].target = SEMI[x+(7-y)*5];
+		aout[3].target = SEMI[(x+(7-y)*5) - 1];
 		// aout[3].target = TONE[x*scale[scale_x]+(7-y)*scale[scale_y]];
 
 

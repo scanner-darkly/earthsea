@@ -1,6 +1,5 @@
 // B00 is EDGE
 
-
 #include <stdio.h>
 
 // asf
@@ -34,7 +33,7 @@
 #include "conf_board.h"
 #include "conf_tc_irq.h"
 #include "ii.h"
-	
+
 
 #define FIRSTRUN_KEY 0x22
 
@@ -54,7 +53,7 @@ const u8 EDGE_GLYPH[3][4] = {{7,5,5,13}, {15,9,9,9}, {15,0,0,0} };
 
 // step = 4096.0 / (10 octave * 12.0 semitones per octave)
 // [int(n * step) for n in xrange(0,128)]
-const u16 SEMI[128] = { 
+const u16 SEMI[128] = {
 	0, 34, 68, 102, 136, 170, 204, 238, 273, 307, 341, 375, 409, 443, 477, 512,
 	546, 580, 614, 648, 682, 716, 750, 785, 819, 853, 887, 921, 955, 989, 1024,
 	1058, 1092, 1126, 1160, 1194, 1228, 1262, 1297, 1331, 1365, 1399, 1433, 1467,
@@ -86,10 +85,10 @@ const u16 EXP[256] = {
 	923, 929, 935, 941, 946, 952, 958, 964, 970, 976, 982, 988, 994, 1000, 1006,
 	1012
 };
-	
+
 // step = 0.9 / 128
 // [int((math.log10(0.1 + (i * step)) + 1) * 4096) for i in xrange(0,128)]
-const u16 LOG[128] = { 
+const u16 LOG[128] = {
 	0, 120, 234, 340, 440, 535, 626, 711, 793, 872, 947, 1019, 1088, 1154, 1219,
 	1281, 1340, 1398, 1454, 1509, 1561, 1613, 1663, 1711, 1758, 1804, 1849, 1893,
 	1935, 1977, 2017, 2057, 2096, 2134, 2172, 2208, 2244, 2279, 2313, 2347, 2380,
@@ -335,7 +334,7 @@ static void pattern_shape(u8 s, u8 x, u8 y);
 void rec_arm(void);
 void rec_start(void);
 void rec_stop(void);
-void rec(u8 shape, u8 x, u8 y); 
+void rec(u8 shape, u8 x, u8 y);
 void play(void);
 void stop(void);
 
@@ -397,7 +396,7 @@ static void aout_write(void) {
 	spi_write(SPI,aout[0].now>>4);
 	spi_write(SPI,aout[0].now<<4);
 	spi_unselectChip(SPI,DAC_SPI_NPCS);
-	
+
 	spi_selectChip(SPI,DAC_SPI_NPCS);
 	spi_write(SPI,0x38);
 	spi_write(SPI,aout[3].now>>4);
@@ -410,14 +409,14 @@ static void aout_write(void) {
 	// cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
 }
 
-static void cvTimer_callback(void* o) { 
+static void cvTimer_callback(void* o) {
 	u8 i;
-	
+
 	if(slew_active) {
 		for(i=0;i<4;i++) {
 			if(aout[i].step) {
 				aout[i].step--;
-				
+
 				if(aout[i].step == 0) {
 					aout[i].now = aout[i].target;
 				}
@@ -425,7 +424,7 @@ static void cvTimer_callback(void* o) {
 					aout[i].a += aout[i].delta;
 					aout[i].now = aout[i].a >> 16;
 				}
-				
+
 				monomeFrameDirty++;
 			}
 		}
@@ -433,7 +432,7 @@ static void cvTimer_callback(void* o) {
 	}
 }
 
-static void clockTimer_callback(void* o) {  
+static void clockTimer_callback(void* o) {
 	u16 s;
 	u8 i1, i2;
 
@@ -464,7 +463,7 @@ static void clockTimer_callback(void* o) {
 				if(s == SHAPE_PATTERN[i1]) break;
 
 			if(i1 < 9) {
-				if(r_status != rOff) 
+				if(r_status != rOff)
 					rec(i1, min_x, min_y + SHAPE_OFF_Y[i1]);
 				shape(i1, min_x, min_y + SHAPE_OFF_Y[i1]);
 				legato = 1;
@@ -501,7 +500,7 @@ static void clockTimer_callback(void* o) {
 				legato = 1;
 			}
 		}
-		
+
 		shape_counter--;
 	}
 
@@ -644,7 +643,7 @@ void rec(u8 shape, u8 x, u8 y) {
 		es.p[p_select].e[rec_position].y = y;
 		if(rec_timer) es.p[p_select].e[rec_position-1].interval = rec_timer-1;
 		else es.p[p_select].e[rec_position-1].interval = 1;
-		
+
 		rec_position++;
 		rec_timer = 0;
 		if(rec_position == EVENTS_PER_PATTERN)
@@ -734,14 +733,14 @@ void pattern_time_double() {
 
 
 
-static void keyTimer_callback(void* o) {  
+static void keyTimer_callback(void* o) {
 	static event_t e;
 	e.type = kEventKeyTimer;
 	e.data = 0;
 	event_post(&e);
 }
 
-static void adcTimer_callback(void* o) {  
+static void adcTimer_callback(void* o) {
 	static event_t e;
 	e.type = kEventPollADC;
 	e.data = 0;
@@ -782,7 +781,7 @@ void timers_set_monome(void) {
 void timers_unset_monome(void) {
 	// print_dbg("\r\n unsetting monome timers");
 	timer_remove( &monomePollTimer );
-	timer_remove( &monomeRefreshTimer ); 
+	timer_remove( &monomeRefreshTimer );
 }
 
 
@@ -804,7 +803,7 @@ static void handler_FtdiDisconnect(s32 data) {
 }
 
 static void handler_MonomeConnect(s32 data) {
-	// print_dbg("\r\n// monome connect /////////////////"); 
+	// print_dbg("\r\n// monome connect /////////////////");
 	key_count = 0;
 	SIZE = monome_size_x();
 	LENGTH = SIZE - 1;
@@ -816,7 +815,7 @@ static void handler_MonomeConnect(s32 data) {
 
 	if(VARI) re = &refresh;
 	else re = &refresh_mono;
-	
+
 	shape_key_count = 0;
 	key_count = 0;
 
@@ -946,7 +945,7 @@ static void handler_KeyTimer(s32 data) {
 				}
 			}
 
-			// print_dbg("\rlong press: "); 
+			// print_dbg("\rlong press: ");
 			// print_dbg_ulong(held_keys[i1]);
 		}
 	}
@@ -955,7 +954,7 @@ static void handler_KeyTimer(s32 data) {
 
 static void handler_ClockNormal(s32 data) {
 	// print_dbg("\r\nclock norm int");
-	// clock_external = !gpio_get_pin_value(B09); 
+	// clock_external = !gpio_get_pin_value(B09);
 }
 
 
@@ -965,16 +964,16 @@ static void handler_ClockNormal(s32 data) {
 ////////////////////////////////////////////////////////////////////////////////
 // application grid code
 
-static void handler_MonomeGridKey(s32 data) { 
+static void handler_MonomeGridKey(s32 data) {
 	u8 x, y, z, index, i1, found;
 
 	monome_grid_key_parse_event_data(data, &x, &y, &z);
 
-	// print_dbg("\r\n grid; x: "); 
-	// print_dbg_hex(x); 
-	// print_dbg("; y: 0x"); 
-	// print_dbg_hex(y); 
-	// print_dbg("; z: 0x"); 
+	// print_dbg("\r\n grid; x: ");
+	// print_dbg_hex(x);
+	// print_dbg("; y: 0x");
+	// print_dbg_hex(y);
+	// print_dbg("; z: 0x");
 	// print_dbg_hex(z);
 
 
@@ -989,9 +988,9 @@ static void handler_MonomeGridKey(s32 data) {
 	} else {
 		found = 0; // "found"
 		for(i1 = 0; i1<key_count; i1++) {
-			if(held_keys[i1] == index) 
+			if(held_keys[i1] == index)
 				found++;
-			if(found) 
+			if(found)
 				held_keys[i1] = held_keys[i1+1];
 		}
 		key_count--;
@@ -1050,7 +1049,7 @@ static void handler_MonomeGridKey(s32 data) {
 		// glyph magic
 		if(z && x>7) {
 			glyph[y] ^= 1<<(x-8);
-			monomeFrameDirty++;	
+			monomeFrameDirty++;
 		}
 	}
 	// NOT PRESET
@@ -1090,7 +1089,7 @@ static void handler_MonomeGridKey(s32 data) {
 			}
 			// SELECT
 			else if(y==1) {
-				
+
 				if(z && mode != mBank) {
 					r_status = rOff;
 					mode = mSelect;
@@ -1136,7 +1135,7 @@ static void handler_MonomeGridKey(s32 data) {
 				if(z) {
 					es.p[p_select].loop ^= 1;
 				}
-				
+
 			}
 			// ARP mode
 			else if(y==4) {
@@ -1310,7 +1309,7 @@ static void shape(u8 s, u8 x, u8 y) {
 		aout[3].target = SEMI[(x+(7-y)*5) - 1];
 		// print_dbg("\r\n cv:");
 		// print_dbg_ulong(aout[3].target);
-		
+
 		// aout[3].target = TONE[x*scale[scale_x]+(7-y)*scale[scale_y]];
 
 		if(port_active) {
@@ -1512,13 +1511,13 @@ static void refresh() {
 		for(i2=0;i2<16;i2++)
 			monomeLedBuffer[i1*16+i2] = es.help[i2][i1] << 2;
 	}
-	
+
 
 	// REC STATUS
 	if(r_status == rArm) monomeLedBuffer[32] = 7;
 	else if(r_status == rRec) monomeLedBuffer[32] = 11 + 4 * (blinker < 24);
 
-	// LOOP and MODE 
+	// LOOP and MODE
 	if(es.p[p_select].loop) monomeLedBuffer[48] = 11;
 	if(arp) monomeLedBuffer[64] = 11;
 
@@ -1566,12 +1565,12 @@ static void refresh() {
 			for(i2=0;i2<4;i2++)
 				if(es.p[i1*4+i2].length) monomeLedBuffer[i1*16+i2+34] = 7;
 				else monomeLedBuffer[i1*16+i2+34] = 4;
-				
+
 
 		monomeLedBuffer[34 + (p_select%4) + (p_select / 4) * 16] = 15;
 
 	}
-	// STATE	
+	// STATE
 	else {
 		if(arp) {
 			if( (es.p[p_select].e[0].y + es.p[p_select].y < 8) && (es.p[p_select].x + es.p[p_select].e[0].x < 16) ) {
@@ -1631,17 +1630,17 @@ static void refresh() {
 			if(root_x < 15) monomeLedBuffer[(root_y)*16+root_x+1] = 7 + 4 * (blinker < 24);
 		}
 		else if(!singled) {
-			if(shape_on == 0) 
+			if(shape_on == 0)
 				{ if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x] = 11; }
 			else if(shape_on == 1)
 				{ if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x+1] = 11; }
 			else if(shape_on == 2) monomeLedBuffer[(root_y)*16+root_x+1] = 11;
 			else if(shape_on == 3) monomeLedBuffer[(root_y+1)*16+root_x+1] = 11;
 			else if(shape_on == 4) {
-				if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x] = 11; 
+				if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x] = 11;
 				if(root_y > 1) monomeLedBuffer[(root_y-2)*16+root_x] = 11; }
-			else if(shape_on == 5) { 
-				if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x+1] = 11; 
+			else if(shape_on == 5) {
+				if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x+1] = 11;
 				if(root_y > 1) monomeLedBuffer[(root_y-2)*16+root_x+2] = 11; }
 			else if(shape_on == 6) { monomeLedBuffer[(root_y)*16+root_x+1] = 11; monomeLedBuffer[(root_y)*16+root_x+2] = 11; }
 			else if(shape_on == 7) { monomeLedBuffer[(root_y+1)*16+root_x+1] = 11; monomeLedBuffer[(root_y+2)*16+root_x+2] = 11; }
@@ -1661,14 +1660,14 @@ static void refresh() {
 static void refresh_mono() {
 	u8 i1, i2, i3;
 
-	// CLEAR // FIXME: optimize? 
+	// CLEAR // FIXME: optimize?
 	for(i1=0;i1<128;i1++) monomeLedBuffer[i1] = 0;
 
 	// REC STATUS
 	if(r_status == rArm) monomeLedBuffer[32] = 15;
 	else if(r_status == rRec) monomeLedBuffer[32] = 15 * (blinker < 24);
 
-	// LOOP and MODE 
+	// LOOP and MODE
 	if(es.p[p_select].loop) monomeLedBuffer[48] = 15;
 	if(arp) monomeLedBuffer[64] = 15;
 
@@ -1704,7 +1703,7 @@ static void refresh_mono() {
 			}
 		}
 
-		if(es.edge == eFixed) 
+		if(es.edge == eFixed)
 			monomeLedBuffer[112 + (es.edge_fixed_time>>4)] = 15;
 	}
 	// SELECT PATTERN
@@ -1716,7 +1715,7 @@ static void refresh_mono() {
 		monomeLedBuffer[34 + (p_select%4) + (p_select / 4) * 16] = (blinker < 24) * 15;
 
 	}
-	// STATE	
+	// STATE
 	else {
 		if(arp)
 			monomeLedBuffer[(es.p[p_select].e[0].y + es.p[p_select].y) * 16 + es.p[p_select].x + es.p[p_select].e[0].x] = 15;
@@ -1774,15 +1773,15 @@ static void refresh_mono() {
 		}
 		else if(!singled) {
 			if(shape_on == 0) monomeLedBuffer[(root_y-1)*16+root_x] = 15;
-			else if(shape_on == 1) 
+			else if(shape_on == 1)
 				{ if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x+1] = 15; }
 			else if(shape_on == 2) monomeLedBuffer[(root_y)*16+root_x+1] = 15;
 			else if(shape_on == 3) monomeLedBuffer[(root_y+1)*16+root_x+1] = 15;
-			else if(shape_on == 4) { 
-				if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x] = 15; 
+			else if(shape_on == 4) {
+				if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x] = 15;
 				if(root_y > 1) monomeLedBuffer[(root_y-2)*16+root_x] = 15; }
-			else if(shape_on == 5) { 
-				if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x+1] = 15; 
+			else if(shape_on == 5) {
+				if(root_y > 0) monomeLedBuffer[(root_y-1)*16+root_x+1] = 15;
 				if(root_y > 1) monomeLedBuffer[(root_y-2)*16+root_x+2] = 15; }
 			else if(shape_on == 6) { monomeLedBuffer[(root_y)*16+root_x+1] = 15; monomeLedBuffer[(root_y)*16+root_x+2] = 15; }
 			else if(shape_on == 7) { monomeLedBuffer[(root_y+1)*16+root_x+1] = 15; monomeLedBuffer[(root_y+2)*16+root_x+2] = 15; }
@@ -1986,7 +1985,7 @@ inline static u16 blend(u8 num, u8 mix) {
 	// mix: [0, 100], 0 == logish, 50 == linear, 100 == expish
 	u32 m;
 	u16 v;
-	
+
 	if (mix < 50) {
 		if (mix == 0) {
 			v = LOG[num];
@@ -2011,7 +2010,7 @@ inline static u16 blend(u8 num, u8 mix) {
 			v = (u16)m;
 		}
 	}
-	
+
 	return v;
 }
 
@@ -2024,7 +2023,7 @@ inline static void aout_set_pitch(u8 num) {
 	}
 	else {
 		aout[3].now = aout[3].target;
-	}	
+	}
 }
 
 inline static void aout_set_pitch_slew(u8 num, u8 port_time) {
@@ -2081,25 +2080,25 @@ static void midi_note_on(u8 ch, u8 num, u8 vel) {
 
 	// keep track of held notes for legato
 	notes_hold(&notes, num, vel);
-		
+
 	// suspend slew cvTimer
 	slew_active = 0;
 	aout_set_pitch(num);
 	aout_set_velocity(vel);
 	aout_set_tracking(num);
 	aout_write();
-	
+
 	// print_dbg("\r\n    dac // p:");
 	// print_dbg_ulong(aout[3].target);
 	// print_dbg(" v: ");
 	// print_dbg_ulong(aout[2].target);
 	// print_dbg(" t: ");
 	// print_dbg_ulong(aout[1].target);
-	
+
 	gpio_set_gpio_pin(B00);
-	
+
 	slew_active = 1;
-	
+
 	reset_hys(); // FIXME: why? is this really correct?
 }
 
@@ -2114,7 +2113,7 @@ static void midi_note_off(u8 ch, u8 num, u8 vel) {
 	if (num > MIDI_NOTE_MAX)
 		// drop notes outside CV range
 		return;
-		
+
 	if (sustain_active == 0) {
 		notes_release(&notes, num);
 
@@ -2149,7 +2148,7 @@ static void midi_channel_pressure(u8 ch, u8 val) {
 	// print_dbg("\r\n midi_channel_pressure(), ch: ");
 	// print_dbg_ulong(ch);
 	// print_dbg(" val: ");
-	// print_dbg_ulong(val);	
+	// print_dbg_ulong(val);
 }
 
 static void midi_pitch_bend(u8 ch, u16 bend) {
@@ -2192,10 +2191,10 @@ static void midi_control_change(u8 ch, u8 num, u8 val) {
 	// print_dbg("\r\n midi_control_change(), ch: ");
 	// print_dbg_ulong(ch);
 	// print_dbg(" num: ");
-	// print_dbg_ulong(num);	
+	// print_dbg_ulong(num);
 	// print_dbg(" val: ");
-	// print_dbg_ulong(val);	
-	
+	// print_dbg_ulong(val);
+
 	switch (num) {
 		case 1:  // mod wheel
 			// TODO: set a small amount of slewing
@@ -2218,9 +2217,9 @@ static void midi_control_change(u8 ch, u8 num, u8 val) {
 static void handler_MidiPollADC(s32 data) {
 	u8 i;
 	u16 cv;
-	
+
 	adc_convert(&adc);
-	
+
 	for (i = 0; i < 3; i++) {
 		if (ain[i].hys) {
 			switch (i) {
@@ -2259,16 +2258,16 @@ static void handler_MidiPollADC(s32 data) {
 static void handler_MidiConnect(s32 data) {
 	// print_dbg("\r\nmidi connect: 0x");
 	// print_dbg_hex(data);
-	
+
 	// disable es and stash global state
 	timer_remove(&clockTimer);
 	//timer_remove(&adcTimer); // done by handler_FtdiDisconnect
 	suspend.port_active = port_active;
 	for (u8 i = 0; i < 4; i++)
 		suspend.aout[i] = aout[i];
-		
+
 	process_ii = &es_midi_process_ii;
-	
+
 	notes_init(&notes);
 	midi_legato = 1; // FIXME: allow this to be controlled!
 	port_active = 1; // FIXME: allow this to be controlled!
@@ -2286,7 +2285,7 @@ static void handler_MidiConnect(s32 data) {
 	app_event_handlers[ kEventPollADC ] = &handler_MidiPollADC;
 
 	reset_hys();
-	
+
 	// install timers
 	timer_add(&adcTimer, 27, &adcTimer_callback, NULL);
 	timer_add(&midiPollTimer, 13, &midi_poll_timer_callback, NULL);
@@ -2311,14 +2310,14 @@ static void handler_MidiDisconnect(s32 data) {
 
   // re-enable es
 	app_event_handlers[ kEventPollADC ] = &handler_PollADC;
-	
+
 	// restore es global state
 	port_active = suspend.port_active;
 	for (u8 i = 0; i < 4; i++)
 		aout[i] = suspend.aout[i];
-	
+
 	process_ii = &es_process_ii;
-	
+
 	// FIXME: copied from main()
 	//timer_add(&adcTimer, 5, &adcTimer_callback, NULL); // done by handler_MonomeConnect
 	timer_add(&clockTimer, 6, &clockTimer_callback, NULL);
@@ -2336,7 +2335,7 @@ static void handler_MidiPacket(s32 raw) {
 
 	// FIXME: ch seems to always be 0?
 
-	// check status byte  
+	// check status byte
   com = (data & 0xf0000000) >> 28;
   ch  = (data & 0x0f000000) >> 24;
 	switch (com) {
@@ -2573,7 +2572,7 @@ int main(void)
 	}
 	else {
 		// load from flash at startup
-		
+
 		preset_select = flashy.preset_select;
 		flash_read();
 		for(i1=0;i1<8;i1++)
@@ -2604,14 +2603,14 @@ int main(void)
 	spi_write(SPI,0xff);
 	spi_write(SPI,0xff);
 	spi_unselectChip(SPI,DAC_SPI_NPCS);
-	
+
 	// ensure cvTimer_callback does something
 	slew_active = 1;
 
 	timer_add(&clockTimer,10,&clockTimer_callback, NULL);
 	timer_add(&cvTimer,5,&cvTimer_callback, NULL);
 	timer_add(&keyTimer,51,&keyTimer_callback, NULL);
-	// adc timer is added inside the monome connect handler 
+	// adc timer is added inside the monome connect handler
 	// timer_add(&adcTimer,61,&adcTimer_callback, NULL);
 
 

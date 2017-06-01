@@ -79,6 +79,8 @@ CSRCS = \
        ../libavr32/src/usb/hid/uhi_hid.c \
        ../libavr32/src/usb/midi/uhi_midi.c \
        ../libavr32/src/usb/midi/midi.c \
+       ../libavr32/src/usb/msc/msc.h \
+       ../libavr32/conf/conf_tc_irq.h \
        avr32/drivers/adc/adc.c                            \
        avr32/drivers/flashc/flashc.c                      \
        avr32/drivers/gpio/gpio.c                          \
@@ -112,6 +114,7 @@ INC_PATH = \
        ../src/usb/ftdi \
        ../src/usb/hid \
        ../src/usb/midi \
+       ../src/usb/msc \
        ../conf      \
        ../conf/trilogy \
        avr32/boards                                       \

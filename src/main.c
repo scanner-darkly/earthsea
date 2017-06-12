@@ -321,7 +321,6 @@ static void handler_None(s32 data) { ;; }
 static void handler_KeyTimer(s32 data);
 static void handler_Front(s32 data);
 static void handler_ClockNormal(s32 data);
-static void handler_II(s32 data);
 
 u8 flash_is_fresh(void);
 void flash_unfresh(void);
@@ -1819,43 +1818,10 @@ static void refresh_preset() {
 
 
 static void es_process_ii(uint8_t *data, uint8_t l) {
-	// print_dbg("\r\nes: ");
-	// print_dbg_hex(i);
-	// print_dbg(" ");
-	// print_dbg_ulong(d);
+    uint8_t command = data[0];
+	int d = (data[1] << 8) + data[2];
 
-	uint8_t i = 0;
-
-	if (i2c_waiting_count < MAX_II_COUNT) {
-        while (i2c_queue[i].waiting == true) i++;
-
-        i2c_queue[i].waiting = true;
-        i2c_queue[i].cmd = data[0];
-        i2c_queue[i].data = (data[1] << 8) + data[2];
-
-        i2c_waiting_count++;
-
-        static event_t e;
-        e.type = kEventII;
-        e.data = i;
-        event_post(&e);
-    }
-    else {
-        print_dbg("\r\ni2c queue full");
-    }
-
-}
-
-
-
-static void handler_II(s32 data) {
-    i2c_queue[data].waiting = false;
-    i2c_waiting_count--;
-
-    uint8_t i = i2c_queue[data].cmd;
-	int d = i2c_queue[data].data;
-
-    switch(i) {
+    switch(command) {
 		case ES_PRESET:
 			if(d<0 || d>7)
 				break;
@@ -2404,8 +2370,6 @@ static inline void assign_main_event_handlers(void) {
 	app_event_handlers[ kEventMidiConnect ]	    = &handler_MidiConnect ;
 	app_event_handlers[ kEventMidiDisconnect ]  = &handler_MidiDisconnect ;
 	app_event_handlers[ kEventMidiPacket ]      = &handler_MidiPacket ;
-
-	app_event_handlers[ kEventII ]      = &handler_II ;
 }
 
 // app event loop

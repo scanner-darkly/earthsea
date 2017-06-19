@@ -68,6 +68,7 @@ CSRCS = \
        ../libavr32/src/init_trilogy.c \
        ../libavr32/src/init_common.c \
        ../libavr32/src/i2c.c \
+       ../libavr32/src/interrupts.c \
        ../libavr32/src/monome.c \
        ../libavr32/src/timers.c \
        ../libavr32/src/notes.c \

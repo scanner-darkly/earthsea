@@ -26,6 +26,7 @@
 #include "util.h"
 #include "ftdi.h"
 #include "i2c.h"
+#include "interrupts.h"
 #include "midi.h"
 #include "notes.h"
 
@@ -385,7 +386,7 @@ static softTimer_t midiPollTimer = { .next = NULL, .prev = NULL };
 
 
 static void aout_write(void) {
-	// cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
+	u8 irq_flags = irqs_pause();
 
 	spi_selectChip(SPI,DAC_SPI_NPCS);
 	spi_write(SPI,0x31);
@@ -405,7 +406,7 @@ static void aout_write(void) {
 	spi_write(SPI,aout[1].now<<4);
 	spi_unselectChip(SPI,DAC_SPI_NPCS);
 
-	// cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
+	irqs_resume(irq_flags);
 }
 
 static void cvTimer_callback(void* o) {
@@ -1322,7 +1323,7 @@ static void shape(u8 s, u8 x, u8 y) {
 	}
 
 	if(!arp && r_status == rOff && !port_active) {
-		// cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
+		u8 irq_flags = irqs_pause();
 
 		spi_selectChip(SPI,DAC_SPI_NPCS);
 
@@ -1336,7 +1337,7 @@ static void shape(u8 s, u8 x, u8 y) {
 
 		spi_unselectChip(SPI,DAC_SPI_NPCS);
 
-		// cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
+		irqs_resume(irq_flags);
 	}
 
 	if(s == 0)
@@ -1424,7 +1425,7 @@ static void pattern_shape(u8 s, u8 x, u8 y) {
 		}
 
 		if(!port_active) {
-			// cpu_irq_disable_level(APP_TC_IRQ_PRIORITY);
+			u8 irq_flags = irqs_pause();
 
 			spi_selectChip(SPI,DAC_SPI_NPCS);
 
@@ -1437,7 +1438,8 @@ static void pattern_shape(u8 s, u8 x, u8 y) {
 			spi_write(SPI,0xff);
 
 			spi_unselectChip(SPI,DAC_SPI_NPCS);
-			// cpu_irq_enable_level(APP_TC_IRQ_PRIORITY);
+
+			irqs_resume(irq_flags);
 		}
 
 		if(s == 0) {
